@@ -15,7 +15,13 @@ def logistic_reg_train(preprocessed_train_path, logistic_reg_model_path):
 
     :return: None
     """
-    train_df = pd.read_csv(preprocessed_train_path)
+
+    # TODO 4 : lire les preprocessed_train_data qui ont été précédemment sauvegardés dans l'étape de preprocessing
+    #  et passer les bons paramètres à la fonction dans le script main.py.
+    """
+    L'import de pandas a déjà été réalisé en haut de ce fichier: import pandas as pd
+    """
+    train_df = None
 
     logistic_reg = LogisticRegression()
     
@@ -25,4 +31,10 @@ def logistic_reg_train(preprocessed_train_path, logistic_reg_model_path):
     )
 
     logging.info("Saving model")
-    dump(logistic_reg, logistic_reg_model_path)
+    # TODO 5 : sauvegarder le modèle logistic_reg dans le dossier LOGISTIC_REG_MODELS_PATH
+    #  avec comme nom la constante LOGISTIC_REG_MODEL_NAME du module src.constants.models. Il faudra comme pour la
+    # TODO 4 passer les bons paramètres dans le script main.py
+    """
+    On utilise la même fonction joblib que ce qui a été fait dans le preprocessing  
+    """
+

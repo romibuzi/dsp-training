@@ -2,7 +2,6 @@ import logging
 
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from joblib import dump
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -61,30 +60,20 @@ def preprocess(training_file_path, preprocessed_train_path, preprocessing_pipeli
     preprocessed_train_df.to_csv(preprocessed_train_path, index=False)
 
     logging.info("Saving the preprocessing pipeline")
-    dump(pipeline, preprocessing_pipeline_path)
+    # TODO 3 : sauvegarder la pipeline de preprocessing dans preprocessing_pipeline_destination
+    """
+    On utilise la librairie joblib pour réaliser la sauvegarde de pipelines et de modèles
+    Il vous faudra trouver la fonction joblib qui permet de faire cette sauvegarde  
+    """
 
 
 def fit_preprocessing_pipeline(train_df, num_features, cat_features):
-    pipeline = ColumnTransformer([
-        (
-            "num_pipeline",
-            Pipeline([
-                ("imputer", SimpleImputer(strategy="median")),
-                ("scaler", StandardScaler())
-            ]),
-            num_features
-        ),
-        (
-            "cat_pipeline",
-            Pipeline([
-                ("imputer", SimpleImputer(strategy="most_frequent")),
-                ("one_hot_encoder", OneHotEncoder(drop="if_binary"))
-            ]),
-            cat_features
-        )
-    ])
-
-    pipeline.fit(train_df)
+    # TODO 2 : instancier la pipeline de preprocessing avec les num_features et les cat_features
+    #  et l'entrainer sur train_df
+    """
+    Se référer au code du notebook
+    """
+    pipeline = None
     return pipeline
 
 

@@ -24,13 +24,17 @@ def main(bool_dict):
                             test_file_path=files.TEST)
 
     if bool_dict["preprocess"]:
-        preprocess(training_file_path=files.TRAIN,
-                   preprocessed_train_path=files.PREPROCESSED_TRAIN,
-                   preprocessing_pipeline_path=files.PREPROCESSING_PIPELINE)
+        # TODO 1 : appeler la méthode preprocess() du module preprocess avec les arguments attendus :
+        #  training_file_path, preprocessed_train_destination et preprocessing_pipeline_destination
+        """
+        Pour savoir quelles valeurs doivent prendre ces arguments, regarder ce que fait la méthode 
+        load_and_split_data() et où elle sauvegarde les différentes données
+        """
+        pass
 
     if bool_dict["logistic_reg_train"]:
-        logistic_reg_train(preprocessed_train_path=files.PREPROCESSED_TRAIN,
-                           logistic_reg_model_path=files.LOGISTIC_REG_MODEL)
+        logistic_reg_train(preprocessed_train_path="???",
+                           logistic_reg_model_path="???")
 
     if bool_dict["predict"]:
         predict(test_file_path=files.TEST,
