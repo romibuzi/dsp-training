@@ -1,8 +1,8 @@
 import logging
+import mlflow
 
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from joblib import dump
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -31,13 +31,13 @@ def load_and_split_data(raw_data_path, training_file_path, test_file_path, test_
     test_df.to_csv(test_file_path, index=False)
 
 
-def preprocess(training_file_path, preprocessed_train_path, preprocessing_pipeline_path):
+def preprocess(training_file_path, preprocessed_train_path, preprocessing_pipeline_name):
     """
     Take training_file_path as input and write preprocessed data into preprocessed_train_path.
 
     :param training_file_path:  path to training data.
     :param preprocessed_train_path: path to preprocessed training data.
-    :param preprocessing_pipeline_path: path to saved preprocessing pipeline.
+    :param preprocessing_pipeline_name: name of the preprocessing pipeline to be saved with mlflow.
 
     :return: None.
     """
@@ -61,7 +61,7 @@ def preprocess(training_file_path, preprocessed_train_path, preprocessing_pipeli
     preprocessed_train_df.to_csv(preprocessed_train_path, index=False)
 
     logging.info("Saving the preprocessing pipeline")
-    dump(pipeline, preprocessing_pipeline_path)
+    mlflow.sklearn.log_model(pipeline, preprocessing_pipeline_name)
 
 
 def fit_preprocessing_pipeline(train_df, num_features, cat_features):

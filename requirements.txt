@@ -1,6 +1,7 @@
 jupyter
 jupytext
 matplotlib
+mlflow
 pandas
 tqdm
 sklearn

@@ -1,17 +1,17 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
-from joblib import dump
+import mlflow
 import logging
 
 import src.constants.columns as c
 
 
-def logistic_reg_train(preprocessed_train_path, logistic_reg_model_path):
+def logistic_reg_train(preprocessed_train_path, logistic_reg_model_name):
     """
     Read preprocessed train data, instantiate model, fit on train data and save model.
 
     :param preprocessed_train_path: path to preprocessed training data.
-    :param logistic_reg_model_path: path to saved logistic reg model.
+    :param logistic_reg_model_name: name of logistic reg model to be saved with mlflow.
 
     :return: None
     """
@@ -25,4 +25,4 @@ def logistic_reg_train(preprocessed_train_path, logistic_reg_model_path):
     )
 
     logging.info("Saving model")
-    dump(logistic_reg, logistic_reg_model_path)
+    mlflow.sklearn.log_model(logistic_reg, logistic_reg_model_name)
