@@ -20,14 +20,14 @@ def predict(test_file_path, preprocessing_pipeline_name, logistic_reg_model_name
     current_run = mlflow.active_run()
 
     logging.info("Loading preprocessing pipeline")
-    preprocessing_pipeline = mlflow.sklearn.load_model(
-        os.path.join(current_run.info.artifact_uri, preprocessing_pipeline_name))
-
+    # TODO 4 : charger le preprocessing pipeline dans le dossier du run actif (allez chercher l’artifact_uri dans
+    #  les infos du run actif). Utilisez os.path.join pour une gestion de fichiers cross-OS.
+    preprocessing_pipeline = NotImplementedError()
     preprocessed_test = preprocessing_pipeline.transform(test_df)
 
     logging.info("Loading trained model")
-    logistic_reg = mlflow.sklearn.load_model(
-        os.path.join(current_run.info.artifact_uri, logistic_reg_model_name))
+    # TODO 5 : charger le modèle dans le dossier du run actif.
+    logistic_reg = NotImplementedError()
 
     logging.info(f"Make predictions with {logistic_reg_model_name}")
     y_pred = logistic_reg.predict(preprocessed_test)

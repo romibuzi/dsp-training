@@ -23,6 +23,6 @@ def evaluate(prediction_file_path):
     y_pred = prediction_df["prediction"].values
 
     score = round(f1_score(y_test, y_pred, pos_label="Y"), 2)
-    mlflow.log_metric("f1_score", score)
+    # TODO 5 : Logging du f1 score comme métrique
 
     logging.info(f"F1 score for model {m.LOGISTIC_REG_MODEL_NAME} is {score}")
