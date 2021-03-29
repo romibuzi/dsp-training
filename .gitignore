@@ -1,10 +1,17 @@
 venv/
+.virtualenvs
 .DS_Store
 .ipynb_checkpoints
 *.pkl
 *.ipynb
 
 data
+/tests/integration_test/data_test/*
+#Keep raw data for integration test (see tests/integration_test/README.md for more explanations).
+!/tests/integration_test/data_test/raw
+
+mlruns
+mlruns_test
 
 __pycache__
 *.pyc
@@ -12,10 +19,4 @@ __pycache__
 .idea/*
 .pytest_cache
 
-mlruns
-mlruns_test
-
-password.txt
-
-infra/.terraform
-infra/terraform.tfstate*
+airflow

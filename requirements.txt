@@ -3,6 +3,8 @@ jupytext
 matplotlib
 mlflow
 pandas
+pytest
+pytest-env
 tqdm
 sklearn
 requests
