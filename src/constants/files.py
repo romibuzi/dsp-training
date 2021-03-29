@@ -23,10 +23,10 @@ INTERIM_DATA = create_folder(os.path.join(DATA_PATH, "interim"))
 OUTPUT_DATA = create_folder(os.path.join(DATA_PATH, "output"))
 MODELS = create_folder(os.path.join(DATA_PATH, "models"))
 
-if not is_running_test:
-    LOANS_DATA_URL = "https://storage.googleapis.com/formation-dsp-data/loans.csv"
-else:
-    LOANS_DATA_URL = "https://storage.googleapis.com/formation-dsp-data/loans_test.csv"
+
+# TODO 4 : si un test est en cours, alors charger le fichier loans_test.csv dans le même bucket Cloud Storage.
+LOANS_DATA_URL = "https://storage.googleapis.com/formation-dsp-data/loans.csv"
+
 
 LOANS = os.path.join(RAW_DATA, "loans.csv")
 

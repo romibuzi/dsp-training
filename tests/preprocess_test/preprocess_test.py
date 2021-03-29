@@ -14,23 +14,30 @@ def test_preprocess():
     setup_mlruns(mlruns_path)
     mlflow.set_experiment(files.MLFLOW_EXPERIMENT_NAME)
     # Given
-    preprocessed_train_path = os.path.join(LOCAL_ROOT, "result_test.csv")
+    # TODO 1 : initialiser la variable preprocessed_train_path avec le chemin vers le fichier result_test.csv du dossier
+    #  preprocess_test, et la variable training_file_path avec le chemin vers le fichier loans_test.csv du même dossier.
+    preprocessed_train_path = NotImplementedError()
+    training_file_path = NotImplementedError()
 
     # When
     preprocess(
-        training_file_path=os.path.join(LOCAL_ROOT, "loans_test.csv"),
+        training_file_path=training_file_path,
         preprocessed_train_path=preprocessed_train_path,
         preprocessing_pipeline_name=files.PREPROCESSING_PIPELINE
     )
 
     # Then
-    expected = pd.read_csv(os.path.join(LOCAL_ROOT, "expected.csv"))
+    # TODO 2 : charger le fichier expected.csv des résultats attendus.
+    expected = NotImplementedError()
     # Read result from csv to avoid problems with nan
     result = pd.read_csv(preprocessed_train_path)
 
     pd.testing.assert_frame_equal(result, expected, check_dtype=False)
 
     try:
-        mlflow.sklearn.load_model(os.path.join(mlflow.active_run().info.artifact_uri, files.PREPROCESSING_PIPELINE))
+        # TODO 3 : charger le preprocessing pipeline depuis mlflow.
+        #  indice : inspirez-vous du code de predict.py
+        active_run = mlflow.active_run()
+        NotImplementedError()
     except IOError:
         raise AssertionError("The preprocessing pipeline has not been saved with mlflow")
