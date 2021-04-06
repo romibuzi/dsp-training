@@ -10,6 +10,7 @@ from src.evaluation.evaluate import evaluate
 from src.predict.predict import predict
 import src.constants.files as files
 import src.constants.models as m
+import src.constants.databricks as d
 
 
 def main(bool_dict):
@@ -23,8 +24,10 @@ def main(bool_dict):
     download_file_from_url(files.LOANS_DATA_URL, os.path.join(files.RAW_DATA, files.LOANS))
 
     today_str = str(datetime.date(datetime.now()))
-    mlflow.set_experiment(files.MLFLOW_EXPERIMENT_NAME)
-    with mlflow.start_run(run_name=today_str):
+    mlflow.set_experiment(d.ROOT_DIR + d.EXPERIMENT_NAME)
+    experiment = mlflow.get_experiment_by_name(d.ROOT_DIR + d.EXPERIMENT_NAME)
+    logging.info(f"The experiment id is {experiment.experiment_id}")
+    with mlflow.start_run(run_name=today_str, experiment_id=experiment.experiment_id):
         if bool_dict["load_and_split"]:
             logging.info("*********** 1/5 Loading and splitting data ***********")
             load_and_split_data(raw_data_path=files.LOANS,

@@ -50,6 +50,10 @@ Tester l'installation
 
     python -m pytest tests
 
-Lancer le projet
+Lancer le projet en utilisant Mlflow avec Databricks
 
+    export MLFLOW_TRACKING_URI=databricks
+    # Specify your Databricks username & password
+    export DATABRICKS_USERNAME="vincent.villet@gmail.com"
+    export DATABRICKS_PASSWORD=$(cat password.txt)
     python main.py

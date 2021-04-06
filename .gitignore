@@ -16,6 +16,3 @@ mlruns
 mlruns_test
 
 password.txt
-
-infra/.terraform
-infra/terraform.tfstate*

@@ -5,7 +5,7 @@ import mlflow
 from mlflow.entities import ViewType
 from mlflow.tracking import MlflowClient
 
-import src.constants.files as files
+import src.constants.databricks as d
 
 
 def predict(test_file_path, preprocessing_pipeline_name, logistic_reg_model_name, prediction_file_path):
@@ -25,7 +25,7 @@ def predict(test_file_path, preprocessing_pipeline_name, logistic_reg_model_name
 
     logging.info("Loading preprocessing pipeline")
     preprocessing_pipeline, pp_run_id = load_latest_preprocessing_pipeline(
-        preprocessing_pipeline_name, files.MLFLOW_EXPERIMENT_NAME)
+        preprocessing_pipeline_name, d.ROOT_DIR + d.EXPERIMENT_NAME)
     if pp_run_id != current_run_id:
         logging.info("Using preprocessing pipeline saved in a previous run")
         mlflow.log_param("preprocessing_pipeline_run_id", pp_run_id)
