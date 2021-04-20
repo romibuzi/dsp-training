@@ -13,9 +13,9 @@ WORKDIR /dsp-training
 COPY . .
 
 # installation des dépendances du projet
-RUN pip3 install -r requirements.txt
+# TODO
 
 RUN python -m pytest tests
 
 # notre script qui va être exécuté quand l'image sera lancée via "docker run"
-CMD ["python3", "main.py"]
+# TODO
