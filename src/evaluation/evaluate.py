@@ -4,6 +4,7 @@ import mlflow
 
 import src.constants.columns as c
 import src.constants.models as m
+import src.constants.files as files
 from sklearn.metrics import f1_score
 
 
@@ -23,6 +24,10 @@ def evaluate(prediction_file_path):
     y_pred = prediction_df["prediction"].values
 
     score = round(f1_score(y_test, y_pred, pos_label="Y"), 2)
-    mlflow.log_metric("f1_score", score)
+
+    with open(files.CURRENT_RUN_ID) as file:
+        current_run_id = file.read()
+    with mlflow.start_run(run_id=current_run_id):
+        mlflow.log_metric("f1_score", score)
 
     logging.info(f"F1 score for model {m.LOGISTIC_REG_MODEL_NAME} is {score}")

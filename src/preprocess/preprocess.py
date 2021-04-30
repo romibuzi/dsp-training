@@ -9,6 +9,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 import src.constants.columns as c
+import src.constants.files as files
 
 
 def load_and_split_data(raw_data_path, training_file_path, test_file_path, test_size=0.2, random_state=1):
@@ -61,7 +62,10 @@ def preprocess(training_file_path, preprocessed_train_path, preprocessing_pipeli
     preprocessed_train_df.to_csv(preprocessed_train_path, index=False)
 
     logging.info("Saving the preprocessing pipeline")
-    mlflow.sklearn.log_model(pipeline, preprocessing_pipeline_name)
+    with open(files.CURRENT_RUN_ID) as file:
+        current_run_id = file.read()
+    with mlflow.start_run(run_id=current_run_id):
+        mlflow.sklearn.log_model(pipeline, preprocessing_pipeline_name)
 
 
 def fit_preprocessing_pipeline(train_df, num_features, cat_features):

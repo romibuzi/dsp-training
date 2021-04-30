@@ -28,6 +28,8 @@ if not is_running_test:
 else:
     LOANS_DATA_URL = "https://storage.googleapis.com/formation-dsp-data/loans_test.csv"
 
+CURRENT_RUN_ID = os.path.join(DATA_PATH, "current_run_id")
+
 LOANS = os.path.join(RAW_DATA, "loans.csv")
 
 TRAIN = os.path.join(INTERIM_DATA, "train.csv")

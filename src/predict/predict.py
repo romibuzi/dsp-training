@@ -21,28 +21,30 @@ def predict(test_file_path, preprocessing_pipeline_name, logistic_reg_model_name
     """
     test_df = pd.read_csv(test_file_path)
 
-    current_run_id = mlflow.active_run().info.run_id
+    with open(files.CURRENT_RUN_ID) as file:
+        current_run_id = file.read()
 
-    logging.info("Loading preprocessing pipeline")
-    preprocessing_pipeline, pp_run_id = load_latest_preprocessing_pipeline(
-        preprocessing_pipeline_name, files.MLFLOW_EXPERIMENT_NAME)
-    if pp_run_id != current_run_id:
-        logging.info("Using preprocessing pipeline saved in a previous run")
-        mlflow.log_param("preprocessing_pipeline_run_id", pp_run_id)
+    with mlflow.start_run(run_id=current_run_id):
+        logging.info("Loading preprocessing pipeline")
+        preprocessing_pipeline, pp_run_id = load_latest_preprocessing_pipeline(
+            preprocessing_pipeline_name, files.MLFLOW_EXPERIMENT_NAME)
+        if pp_run_id != current_run_id:
+            logging.info("Using preprocessing pipeline saved in a previous run")
+            mlflow.log_param("preprocessing_pipeline_run_id", pp_run_id)
 
-    preprocessed_test = preprocessing_pipeline.transform(test_df)
+        preprocessed_test = preprocessing_pipeline.transform(test_df)
 
-    logging.info("Loading trained model")
-    logistic_reg = mlflow.sklearn.load_model(
-        os.path.join(mlflow.active_run().info.artifact_uri, logistic_reg_model_name))
+        logging.info("Loading trained model")
+        logistic_reg = mlflow.sklearn.load_model(
+            os.path.join(mlflow.active_run().info.artifact_uri, logistic_reg_model_name))
 
-    logging.info(f"Make predictions with {logistic_reg_model_name}")
-    y_pred = logistic_reg.predict(preprocessed_test)
+        logging.info(f"Make predictions with {logistic_reg_model_name}")
+        y_pred = logistic_reg.predict(preprocessed_test)
 
-    test_df["prediction"] = y_pred
+        test_df["prediction"] = y_pred
 
-    logging.info("Saving prediction results")
-    test_df.to_csv(prediction_file_path, index=False)
+        logging.info("Saving prediction results")
+        test_df.to_csv(prediction_file_path, index=False)
 
 
 def load_latest_preprocessing_pipeline(preprocessing_pipeline_name, experiment_name):

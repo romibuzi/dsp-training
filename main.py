@@ -22,36 +22,44 @@ def main(bool_dict):
     """
     download_file_from_url(files.LOANS_DATA_URL, os.path.join(files.RAW_DATA, files.LOANS))
 
-    today_str = str(datetime.date(datetime.now()))
     mlflow.set_experiment(files.MLFLOW_EXPERIMENT_NAME)
+    initialize_mlflow_run()
+
+    if bool_dict["load_and_split"]:
+        logging.info("*********** 1/5 Loading and splitting data ***********")
+        load_and_split_data(raw_data_path=files.LOANS,
+                            training_file_path=files.TRAIN,
+                            test_file_path=files.TEST)
+
+    if bool_dict["preprocess"]:
+        logging.info("*********** 2/5 Preprocessing ***********")
+        preprocess(training_file_path=files.TRAIN,
+                   preprocessed_train_path=files.PREPROCESSED_TRAIN,
+                   preprocessing_pipeline_name=files.PREPROCESSING_PIPELINE)
+
+    if bool_dict["logistic_reg_train"]:
+        logging.info("*********** 3/5 Modeling ***********")
+        logistic_reg_train(preprocessed_train_path=files.PREPROCESSED_TRAIN,
+                           logistic_reg_model_name=m.LOGISTIC_REG_MODEL_NAME)
+
+    if bool_dict["predict"]:
+        logging.info("*********** 4/5 Prediction ***********")
+        predict(test_file_path=files.TEST,
+                preprocessing_pipeline_name=files.PREPROCESSING_PIPELINE,
+                logistic_reg_model_name=m.LOGISTIC_REG_MODEL_NAME,
+                prediction_file_path=files.PREDICTIONS_TEST)
+
+    if bool_dict["evaluate"]:
+        logging.info("*********** 5/5 Evaluation ***********")
+        evaluate(prediction_file_path=files.PREDICTIONS_TEST)
+
+
+def initialize_mlflow_run():
+    today_str = str(datetime.date(datetime.now()))
     with mlflow.start_run(run_name=today_str):
-        if bool_dict["load_and_split"]:
-            logging.info("*********** 1/5 Loading and splitting data ***********")
-            load_and_split_data(raw_data_path=files.LOANS,
-                                training_file_path=files.TRAIN,
-                                test_file_path=files.TEST)
-
-        if bool_dict["preprocess"]:
-            logging.info("*********** 2/5 Preprocessing ***********")
-            preprocess(training_file_path=files.TRAIN,
-                       preprocessed_train_path=files.PREPROCESSED_TRAIN,
-                       preprocessing_pipeline_name=files.PREPROCESSING_PIPELINE)
-
-        if bool_dict["logistic_reg_train"]:
-            logging.info("*********** 3/5 Modeling ***********")
-            logistic_reg_train(preprocessed_train_path=files.PREPROCESSED_TRAIN,
-                               logistic_reg_model_name=m.LOGISTIC_REG_MODEL_NAME)
-
-        if bool_dict["predict"]:
-            logging.info("*********** 4/5 Prediction ***********")
-            predict(test_file_path=files.TEST,
-                    preprocessing_pipeline_name=files.PREPROCESSING_PIPELINE,
-                    logistic_reg_model_name=m.LOGISTIC_REG_MODEL_NAME,
-                    prediction_file_path=files.PREDICTIONS_TEST)
-
-        if bool_dict["evaluate"]:
-            logging.info("*********** 5/5 Evaluation ***********")
-            evaluate(prediction_file_path=files.PREDICTIONS_TEST)
+        current_run_id = mlflow.active_run().info.run_id
+        with open(files.CURRENT_RUN_ID, "w") as file:
+            file.write(current_run_id)
 
 
 if __name__ == "__main__":

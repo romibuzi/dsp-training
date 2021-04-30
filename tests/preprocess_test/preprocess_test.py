@@ -4,6 +4,8 @@ import mlflow
 
 from src.constants import files
 from src.preprocess.preprocess import preprocess
+from main import initialize_mlflow_run
+
 from tests.utils import setup_mlruns
 
 LOCAL_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)))
@@ -13,6 +15,7 @@ def test_preprocess():
     mlruns_path = os.path.join("file:", LOCAL_ROOT, "mlruns_test").replace("C:", "")
     setup_mlruns(mlruns_path)
     mlflow.set_experiment(files.MLFLOW_EXPERIMENT_NAME)
+    initialize_mlflow_run()
     # Given
     preprocessed_train_path = os.path.join(LOCAL_ROOT, "result_test.csv")
 
@@ -31,6 +34,9 @@ def test_preprocess():
     pd.testing.assert_frame_equal(result, expected, check_dtype=False)
 
     try:
-        mlflow.sklearn.load_model(os.path.join(mlflow.active_run().info.artifact_uri, files.PREPROCESSING_PIPELINE))
+        with open(files.CURRENT_RUN_ID) as file:
+            current_run_id = file.read()
+        with mlflow.start_run(run_id=current_run_id):
+            mlflow.sklearn.load_model(os.path.join(mlflow.active_run().info.artifact_uri, files.PREPROCESSING_PIPELINE))
     except IOError:
         raise AssertionError("The preprocessing pipeline has not been saved with mlflow")

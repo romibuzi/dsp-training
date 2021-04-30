@@ -4,6 +4,7 @@ import mlflow
 import logging
 
 import src.constants.columns as c
+import src.constants.files as files
 
 
 def logistic_reg_train(preprocessed_train_path, logistic_reg_model_name):
@@ -25,4 +26,7 @@ def logistic_reg_train(preprocessed_train_path, logistic_reg_model_name):
     )
 
     logging.info("Saving model")
-    mlflow.sklearn.log_model(logistic_reg, logistic_reg_model_name)
+    with open(files.CURRENT_RUN_ID) as file:
+        current_run_id = file.read()
+    with mlflow.start_run(run_id=current_run_id):
+        mlflow.sklearn.log_model(logistic_reg, logistic_reg_model_name)

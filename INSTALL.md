@@ -53,3 +53,40 @@ Tester l'installation
 Lancer le projet
 
     python main.py
+
+### Installer Airflow
+
+    source venv/bin/activate
+
+    pip3 install apache-airflow==1.10.12 --constraint airflow_constraints.txt
+
+    cd dsp-training # If you are not already at root dir
+
+    export AIRFLOW_HOME=$(pwd)/airflow
+    export AIRFLOW__CORE__LOAD_EXAMPLES=False
+    export AIRFLOW__WEBSERVER__RBAC=True
+
+Créer la base de données
+
+    airflow initdb
+
+    airflow create_user \
+    --username admin \
+    --firstname Peter \
+    --lastname Parker \
+    --role Admin \
+    --email spiderman@superhero.org
+
+Lancer Airflow
+
+    export AIRFLOW_HOME=$(pwd)/airflow
+    airflow webserver --port 8080
+    
+    # en cas d’erreur "no module named airflow.www"
+    # https://stackoverflow.com/questions/53583633/how-to-resolve-error-no-module-named-airflow-www-while-starting-airflow-web
+    pip3 uninstall -y gunicorn
+    pip3 install gunicorn==19.4.0
+
+    # Dans un 2ème terminal
+    export AIRFLOW_HOME=$(pwd)/airflow
+    airflow scheduler
