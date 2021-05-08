@@ -1,11 +1,11 @@
-import pandas as pd
 import logging
-import mlflow
 
-import src.constants.columns as c
-import src.constants.models as m
-import src.constants.files as files
+import constants.columns as c
+import constants.models as m
+import constants.files as files
 from sklearn.metrics import f1_score
+
+from utils import load_pandas_df_from_s3
 
 
 def evaluate(prediction_file_path):
@@ -16,7 +16,7 @@ def evaluate(prediction_file_path):
 
     :return: None
     """
-    prediction_df = pd.read_csv(prediction_file_path)
+    prediction_df = load_pandas_df_from_s3(files.S3_BUCKET, prediction_file_path)
 
     logging.info(f"Evaluating {m.LOGISTIC_REG_MODEL_NAME}")
 
@@ -24,10 +24,5 @@ def evaluate(prediction_file_path):
     y_pred = prediction_df["prediction"].values
 
     score = round(f1_score(y_test, y_pred, pos_label="Y"), 2)
-
-    with open(files.CURRENT_RUN_ID) as file:
-        current_run_id = file.read()
-    with mlflow.start_run(run_id=current_run_id):
-        mlflow.log_metric("f1_score", score)
 
     logging.info(f"F1 score for model {m.LOGISTIC_REG_MODEL_NAME} is {score}")

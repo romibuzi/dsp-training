@@ -1,69 +1,34 @@
-import os
-import pandas as pd
 import logging
-import mlflow
-from mlflow.entities import ViewType
-from mlflow.tracking import MlflowClient
 
-import src.constants.files as files
+import constants.files as files
+from utils import load_ml_object_from_s3, upload_pandas_df_to_s3, load_pandas_df_from_s3
 
 
-def predict(test_file_path, preprocessing_pipeline_name, logistic_reg_model_name, prediction_file_path):
+def predict(test_file_path, preprocessing_pipeline_path, logistic_reg_model_path, prediction_file_path):
     """
     Make prediction on test data with saved model.
 
     :param test_file_path: path to test data.
-    :param preprocessing_pipeline_name: name of the preprocessing pipeline saved with mlflow.
-    :param logistic_reg_model_name: name of logistic reg model to be saved with mlflow.
+    :param preprocessing_pipeline_path: path to the preprocessing pipeline saved with mlflow.
+    :param logistic_reg_model_path: path to the logistic reg model.
     :param prediction_file_path: path to prediction data.
 
     :return: None
     """
-    test_df = pd.read_csv(test_file_path)
+    test_df = load_pandas_df_from_s3(files.S3_BUCKET, test_file_path)
 
-    with open(files.CURRENT_RUN_ID) as file:
-        current_run_id = file.read()
+    logging.info("Loading preprocessing pipeline")
+    preprocessing_pipeline = load_ml_object_from_s3(files.S3_BUCKET, preprocessing_pipeline_path)
 
-    with mlflow.start_run(run_id=current_run_id):
-        logging.info("Loading preprocessing pipeline")
-        preprocessing_pipeline, pp_run_id = load_latest_preprocessing_pipeline(
-            preprocessing_pipeline_name, files.MLFLOW_EXPERIMENT_NAME)
-        if pp_run_id != current_run_id:
-            logging.info("Using preprocessing pipeline saved in a previous run")
-            mlflow.log_param("preprocessing_pipeline_run_id", pp_run_id)
+    preprocessed_test = preprocessing_pipeline.transform(test_df)
 
-        preprocessed_test = preprocessing_pipeline.transform(test_df)
+    logging.info("Loading trained model")
+    logistic_reg = load_ml_object_from_s3(files.S3_BUCKET, logistic_reg_model_path)
 
-        logging.info("Loading trained model")
-        logistic_reg = mlflow.sklearn.load_model(
-            os.path.join(mlflow.active_run().info.artifact_uri, logistic_reg_model_name))
+    logging.info(f"Make predictions with {logistic_reg_model_path}")
+    y_pred = logistic_reg.predict(preprocessed_test)
 
-        logging.info(f"Make predictions with {logistic_reg_model_name}")
-        y_pred = logistic_reg.predict(preprocessed_test)
+    test_df["prediction"] = y_pred
 
-        test_df["prediction"] = y_pred
-
-        logging.info("Saving prediction results")
-        test_df.to_csv(prediction_file_path, index=False)
-
-
-def load_latest_preprocessing_pipeline(preprocessing_pipeline_name, experiment_name):
-    experiment_id = mlflow.get_experiment_by_name(experiment_name).experiment_id
-
-    runs = MlflowClient().search_runs(
-        experiment_ids=str(experiment_id),
-        run_view_type=ViewType.ACTIVE_ONLY,
-        order_by=["tag.start_time DESC"]
-    )
-
-    for run in runs:
-        run_id = run.info.run_id
-        artifact_uri = run.info.artifact_uri
-        try:
-            return mlflow.sklearn.load_model(os.path.join(artifact_uri, preprocessing_pipeline_name)), run_id
-        except:
-            continue
-
-    raise Exception(
-        f"Could not find a preprocessing pipeline named {preprocessing_pipeline_name} in current and previous runs"
-    )
+    logging.info("Saving prediction results")
+    upload_pandas_df_to_s3(test_df, files.S3_BUCKET, prediction_file_path)

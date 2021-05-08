@@ -24,7 +24,7 @@ import seaborn as sns
 import sys
 sys.path.append("..")
 
-from src.constants import files, columns as c
+from constants import files, columns as c
 import os
 
 from sklearn.model_selection import train_test_split

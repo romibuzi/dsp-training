@@ -1,10 +1,19 @@
-from tqdm import tqdm
 import os
-import logging
-import requests
+import pandas as pd
 import numpy as np
+import boto3
+from joblib import dump
+from joblib import load
+import logging
+from datetime import datetime
 
-import src.constants.files as files
+from constants.files import create_folder, S3_BUCKET
+
+PROJECT_ROOT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",)
+LOG_PATH = create_folder(os.path.join(PROJECT_ROOT_PATH, "logs"))
+
+log_filename = datetime.now().strftime("%Y-%m-%d") + ".log"
+LOG_FILE = os.path.join(LOG_PATH, log_filename)
 
 
 def mean_absolute_percentage_error(y_true, y_pred):
@@ -12,12 +21,54 @@ def mean_absolute_percentage_error(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true))
 
 
-def download_file_from_url(url, file_path, overwrite=False):
-    if not overwrite and os.path.exists(file_path):
-        logging.info(f"File '{file_path.replace(files.PROJECT_ROOT_PATH, '')}' already exists, we do not overwrite it")
-        return
-    logging.info(f"Download file at url {url} to '{file_path.replace(files.PROJECT_ROOT_PATH, '')}'")
-    r = requests.get(url, stream=True)
-    with open(file_path, 'wb') as f:
-        for chunk in tqdm(r.iter_content(10 ** 5)):
-            f.write(chunk)
+def upload_pandas_df_to_s3(df, s3_bucket, filename):
+    s3_resource = boto3.resource('s3')
+
+    df.to_csv(filename.replace("/", "-"), index=False)
+    s3_resource.Object(s3_bucket, filename).upload_file(Filename=filename.replace("/", "-"))
+    os.remove(filename.replace("/", "-"))
+
+
+def load_pandas_df_from_s3(s3_bucket, filename):
+    s3_resource = boto3.resource('s3')
+
+    s3_resource.Object(s3_bucket, filename).download_file(Filename=filename.replace("/", "-"))
+    df = pd.read_csv(filename.replace("/", "-"))
+    os.remove(filename.replace("/", "-"))
+
+    return df
+
+
+def upload_ml_object_to_s3(pipeline_or_model, s3_bucket, filename):
+    s3_resource = boto3.resource('s3')
+
+    dump(pipeline_or_model, filename.replace("/", "-"))
+    s3_resource.Object(s3_bucket, filename).upload_file(Filename=filename.replace("/", "-"))
+    os.remove(filename.replace("/", "-"))
+
+
+def load_ml_object_from_s3(s3_bucket, filename):
+    s3_resource = boto3.resource('s3')
+
+    s3_resource.Object(s3_bucket, filename).download_file(Filename=filename.replace("/", "-"))
+    ml_object = load(filename.replace("/", "-"))
+    os.remove(filename.replace("/", "-"))
+
+    return ml_object
+
+
+def setup_logs():
+    logging_format = "%(asctime)s - %(levelname)s - %(message)s"
+    logging.basicConfig(filename=LOG_FILE, level=logging.INFO, format=logging_format)
+
+    # Set up logging to console
+    console = logging.StreamHandler()
+    console.setLevel(logging.DEBUG)
+    console.setFormatter(logging.Formatter(logging_format))
+    logging.getLogger('').addHandler(console)
+
+
+def upload_logs_to_s3():
+    s3_resource = boto3.resource('s3')
+
+    s3_resource.Object(S3_BUCKET, f"data/logs/{log_filename}").upload_file(Filename=LOG_FILE)

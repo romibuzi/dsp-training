@@ -1,23 +1,20 @@
 from datetime import datetime, timedelta
 from airflow.models import DAG
+import pytz
+
 import sys
 import os
-import pytz
+PATH_MODULES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "src")
+sys.path += [PATH_MODULES]
 
 from airflow.operators.python_operator import PythonOperator
 
-PATH_MODULES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..",)
-sys.path += [PATH_MODULES]
+from preprocess.preprocess import preprocess, load_and_split_data
+from logistic_reg.logistic_reg_train import logistic_reg_train
+from evaluation.evaluate import evaluate
+from predict.predict import predict
 
-from src.preprocess.preprocess import preprocess, load_and_split_data
-from src.logistic_reg.logistic_reg_train import logistic_reg_train
-from src.evaluation.evaluate import evaluate
-from src.predict.predict import predict
-from src.utils import download_file_from_url
-from main import initialize_mlflow_run
-
-import src.constants.files as files
-import src.constants.models as m
+import constants.files as files
 
 
 # These args will get passed on to each operator
@@ -40,18 +37,6 @@ with DAG(
         tags=['train'],
 ) as dag:
 
-    initialize_mlflow_run = PythonOperator(
-        task_id='initialize_mlflow_run',
-        python_callable=initialize_mlflow_run
-    )
-
-    download = PythonOperator(
-        task_id='download',
-        python_callable=download_file_from_url,
-        op_kwargs={'url': files.LOANS_DATA_URL,
-                   'file_path': os.path.join(files.RAW_DATA, files.LOANS)}
-
-    )
     load_and_split = PythonOperator(
         task_id='load_and_split',
         python_callable=load_and_split_data,
@@ -65,22 +50,22 @@ with DAG(
         python_callable=preprocess,
         op_kwargs={'training_file_path': files.TRAIN,
                    'preprocessed_train_path': files.PREPROCESSED_TRAIN,
-                   'preprocessing_pipeline_name': files.PREPROCESSING_PIPELINE}
+                   'preprocessing_pipeline_path': files.PREPROCESSING_PIPELINE}
     )
 
     model = PythonOperator(
         task_id='model',
         python_callable=logistic_reg_train,
         op_kwargs={'preprocessed_train_path': files.PREPROCESSED_TRAIN,
-                   'logistic_reg_model_name': m.LOGISTIC_REG_MODEL_NAME}
+                   'logistic_reg_model_path': files.LOGISTIC_REG_MODEL}
     )
 
     predict = PythonOperator(
         task_id='predict',
         python_callable=predict,
         op_kwargs={'test_file_path': files.TEST,
-                   'preprocessing_pipeline_name': files.PREPROCESSING_PIPELINE,
-                   'logistic_reg_model_name': m.LOGISTIC_REG_MODEL_NAME,
+                   'preprocessing_pipeline_path': files.PREPROCESSING_PIPELINE,
+                   'logistic_reg_model_path': files.LOGISTIC_REG_MODEL,
                    'prediction_file_path': files.PREDICTIONS_TEST}
     )
 
@@ -91,4 +76,4 @@ with DAG(
     )
 
 
-initialize_mlflow_run >> download >> load_and_split >> preprocess >> model >> predict >> evaluate
+load_and_split >> preprocess >> model >> predict >> evaluate

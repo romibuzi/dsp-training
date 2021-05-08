@@ -50,8 +50,9 @@ Tester l'installation
 
     python -m pytest tests
 
-Lancer le projet
+Lancer le projet en local sans Airflow
 
+    export PYTHONPATH="./src/:$PYTHONPATH"    
     python main.py
 
 ## Airflow
@@ -90,6 +91,12 @@ Lancer Airflow
     pip3 uninstall -y gunicorn
     pip3 install gunicorn==19.4.0
 
+Lancer le scheduler
+
     # Dans un 2ème terminal
+    export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES # https://stackoverflow.com/questions/66676165/airflow-task-for-uploading-file-to-s3-bucket-using-boto3-cause-python-to-crash-a
     export AIRFLOW_HOME=$(pwd)/airflow
     airflow scheduler
+
+Documentation Airflow sur AWS: https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/connections/aws.html
+

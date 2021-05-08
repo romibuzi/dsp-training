@@ -1,22 +1,23 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
-import mlflow
 import logging
+import os
 
-import src.constants.columns as c
-import src.constants.files as files
+import constants.columns as c
+import constants.files as files
+from utils import upload_ml_object_to_s3, load_pandas_df_from_s3
 
 
-def logistic_reg_train(preprocessed_train_path, logistic_reg_model_name):
+def logistic_reg_train(preprocessed_train_path, logistic_reg_model_path):
     """
     Read preprocessed train data, instantiate model, fit on train data and save model.
 
     :param preprocessed_train_path: path to preprocessed training data.
-    :param logistic_reg_model_name: name of logistic reg model to be saved with mlflow.
+    :param logistic_reg_model_path: path to the logistic reg model.
 
     :return: None
     """
-    train_df = pd.read_csv(preprocessed_train_path)
+    train_df = load_pandas_df_from_s3(files.S3_BUCKET, preprocessed_train_path)
 
     logistic_reg = LogisticRegression()
     
@@ -26,7 +27,4 @@ def logistic_reg_train(preprocessed_train_path, logistic_reg_model_name):
     )
 
     logging.info("Saving model")
-    with open(files.CURRENT_RUN_ID) as file:
-        current_run_id = file.read()
-    with mlflow.start_run(run_id=current_run_id):
-        mlflow.sklearn.log_model(logistic_reg, logistic_reg_model_name)
+    upload_ml_object_to_s3(logistic_reg, files.S3_BUCKET, logistic_reg_model_path)
