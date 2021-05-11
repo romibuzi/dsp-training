@@ -58,8 +58,8 @@ def initialize_mlflow_run():
     today_str = str(datetime.date(datetime.now()))
     with mlflow.start_run(run_name=today_str):
         current_run_id = mlflow.active_run().info.run_id
-        with open(files.CURRENT_RUN_ID, "w") as file:
-            file.write(current_run_id)
+        # TODO 1 : Écrivez le current_run_id dans le fichier files.CURRENT_RUN_ID afin que les autres étapes puissent
+        #  le récupérer de façon indépendante du script main.py.
 
 
 if __name__ == "__main__":

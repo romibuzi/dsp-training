@@ -62,8 +62,8 @@ def preprocess(training_file_path, preprocessed_train_path, preprocessing_pipeli
     preprocessed_train_df.to_csv(preprocessed_train_path, index=False)
 
     logging.info("Saving the preprocessing pipeline")
-    with open(files.CURRENT_RUN_ID) as file:
-        current_run_id = file.read()
+    # TODO 2 : récupérer le current_run_id là où la fonction main() l’a écrit. Ne regardez pas la solution dans les
+    #  étapes suivantes.
     with mlflow.start_run(run_id=current_run_id):
         mlflow.sklearn.log_model(pipeline, preprocessing_pipeline_name)
 
