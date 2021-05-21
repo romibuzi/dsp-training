@@ -100,3 +100,5 @@ Lancer le scheduler
 
 Documentation Airflow sur AWS: https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/connections/aws.html
 
+Optionnel : lancer un serveur d'email en local de debug où airflow enverra les emails
+sudo python -m smtpd -n -c DebuggingServer localhost:25

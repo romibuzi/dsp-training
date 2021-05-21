@@ -37,4 +37,6 @@ def monitor(prediction_file_path, prediction_history_path, metrics_history_path)
 
     # Alert if necessary
     if accepted_loans_ratio < 0.4:
-        logging.warning(f"Accepted loans ratio has dropped below 0.4 ! Currently at {accepted_loans_ratio:.2f}")
+        msg = f"Accepted loans ratio has dropped below 0.4 ! Currently at {accepted_loans_ratio:.2f}"
+        logging.warning(msg)
+        raise Exception(msg)
