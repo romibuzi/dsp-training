@@ -22,7 +22,9 @@ def monitor(prediction_file_path, prediction_history_path, metrics_history_path)
     upload_pandas_df_to_s3(new_prediction_history, files.S3_BUCKET, prediction_history_path)
 
     logging.info("Compute new metrics and upload to s3.")
-    accepted_loans_ratio = new_predictions["prediction"].value_counts()["Y"] / len(new_predictions)
+    # TODO 1 : calculer le ratio des attributions de crédits par rapport à l'ensemble des demandes
+    # ex: 50 crédits acceptés sur 100 demandes = 50%
+    accepted_loans_ratio = NotImplemented()
     logging.info(f"Accepted loans ratio: {accepted_loans_ratio:.5f}")
     new_metric_df = pd.DataFrame.from_records([{"date": datetime_now, "accepted_loans_ratio": accepted_loans_ratio}])
 
@@ -36,7 +38,6 @@ def monitor(prediction_file_path, prediction_history_path, metrics_history_path)
     upload_pandas_df_to_s3(new_metrics_history, files.S3_BUCKET, metrics_history_path)
 
     # Alert if necessary
-    if accepted_loans_ratio < 0.4:
-        msg = f"Accepted loans ratio has dropped below 0.4 ! Currently at {accepted_loans_ratio:.2f}"
-        logging.warning(msg)
-        raise Exception(msg)
+    # TODO 2 : logger un warning et lever une exception si le ratio des attributions de crédits (accepted_loans_ratio)
+    #  descend en dessous de 40%
+

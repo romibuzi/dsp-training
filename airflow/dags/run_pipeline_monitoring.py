@@ -43,17 +43,17 @@ with DAG(
     predict = PythonOperator(
         task_id='predict',
         python_callable=predict,
-        op_kwargs={'test_file_path': files.NEW_LOANS_TO_ACCEPT,
+        # TODO 3 : remplir les paramètres test_file_path et prediction_file_path avec le nouveau fichier de loans
+        #  à prédire ainsi que le chemin vers les prédictions du jour (new_predictions.csv)
+        op_kwargs={'test_file_path': '',
                    'preprocessing_pipeline_path': files.PREPROCESSING_PIPELINE,
                    'logistic_reg_model_path': m.LOGISTIC_REG_MODEL_NAME,
-                   'prediction_file_path': files.NEW_PREDICTIONS}
+                   'prediction_file_path': ''}
     )
 
-    monitor = PythonOperator(
-        task_id='evaluate',
-        python_callable=monitor,
-        op_kwargs={'prediction_file_path': files.NEW_PREDICTIONS}
-    )
+    # TODO 4 : implémenter l'opérateur monitor en se basant sur l'exemple de l'opérateur predict
+    #  qui appelera la méthode monitor du module monitor
+    monitor = NotImplemented
 
     alert_email = EmailOperator(
         task_id='send_alerting_email',
