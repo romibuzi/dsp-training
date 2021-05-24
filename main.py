@@ -23,6 +23,7 @@ def main(bool_dict):
     download_file_from_url(files.LOANS_DATA_URL, os.path.join(files.RAW_DATA, files.LOANS))
 
     today_str = str(datetime.date(datetime.now()))
+    mlflow.set_tracking_uri(files.MLFLOW_TRACKING_URI)
     mlflow.set_experiment(files.MLFLOW_EXPERIMENT_NAME)
     with mlflow.start_run(run_name=today_str):
         if bool_dict["load_and_split"]:

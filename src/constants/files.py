@@ -24,6 +24,7 @@ TRAIN = os.path.join(INTERIM_DATA, "train.csv")
 TEST = os.path.join(INTERIM_DATA, "test.csv")
 PREPROCESSED_TRAIN = os.path.join(INTERIM_DATA, "preprocessed_train.csv")
 
+MLFLOW_TRACKING_URI = "http://54.194.75.209:5000"
 MLFLOW_EXPERIMENT_NAME = "mlflow-experiment"
 # The preprocessing is not attached to a folder because it is saved with mlflow.
 PREPROCESSING_PIPELINE = "pipeline"
