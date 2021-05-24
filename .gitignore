@@ -21,3 +21,6 @@ __pycache__
 
 airflow
 !airflow/dags
+
+# Private keys for connecting to EC2 instances
+*.pem

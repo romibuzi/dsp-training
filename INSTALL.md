@@ -54,9 +54,12 @@ Lancer le projet
 
     python main.py
 
-### Installer Airflow
+## Airflow
 
-    source venv/bin/activate
+Les commandes suivantes peuvent être lancées en local sur les Mac et distributions Linux.
+Si vous avez un ordinateur Windows, connectez-vous en ssh à une machine Linux sur le cloud (par exemple, une instance EC2) et suivez les instructions du script [ec2_for_airflow_setup.sh](ec2_for_airflow_setup.sh)
+
+Installation
 
     pip3 install apache-airflow==1.10.12 --constraint airflow_constraints.txt
 
