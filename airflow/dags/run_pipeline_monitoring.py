@@ -15,7 +15,7 @@ from preprocess.preprocess import preprocess, load_and_split_data
 from logistic_reg.logistic_reg_train import logistic_reg_train
 from evaluation.evaluate import evaluate
 from predict.predict import predict
-from monitor.monitor import monitor
+from monitor.monitor import monitor_loans_ratio
 
 import constants.files as files
 import constants.models as m
@@ -51,7 +51,7 @@ with DAG(
 
     monitor = PythonOperator(
         task_id='evaluate',
-        python_callable=monitor,
+        python_callable=monitor_loans_ratio,
         op_kwargs={'prediction_file_path': files.NEW_PREDICTIONS}
     )
 
