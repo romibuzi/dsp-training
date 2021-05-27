@@ -38,4 +38,5 @@ LOGISTIC_REG_MODEL = os.path.join(LOGISTIC_REG_MODELS_PATH, m.LOGISTIC_REG_MODEL
 
 PREDICTIONS_TEST = os.path.join(OUTPUT_DATA, f"{m.LOGISTIC_REG_MODEL_NAME}_predictions.csv")
 
-S3_BUCKET = "mlflow-dsp-training"
+# TODO 1: setup s3 bucket
+S3_BUCKET = NotImplementedError()

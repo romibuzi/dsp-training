@@ -13,7 +13,9 @@ PROJECT_ROOT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..
 LOG_PATH = create_folder(os.path.join(PROJECT_ROOT_PATH, "logs"))
 
 log_filename = datetime.now().strftime("%Y-%m-%d") + ".log"
-LOG_FILE = os.path.join(LOG_PATH, log_filename)
+# TODO 2: Créez le chemin vers la sauvegarde des logs en local à partir des variables ci-dessus.
+#  Ce chemin sera utilisé par la fonction setup_logs définie en bas de ce fichier.
+LOG_FILE = NotImplementedError()
 
 
 def mean_absolute_percentage_error(y_true, y_pred):
@@ -33,7 +35,8 @@ def load_pandas_df_from_s3(s3_bucket, filename):
     s3_resource = boto3.resource('s3')
 
     s3_resource.Object(s3_bucket, filename).download_file(Filename=filename.replace("/", "-"))
-    df = pd.read_csv(filename.replace("/", "-"))
+    # TODO 3: Compléter la fonction load_pandas_df_from_s3.
+    df = NotImplementedError()
     os.remove(filename.replace("/", "-"))
 
     return df

@@ -7,7 +7,7 @@ from evaluation.evaluate import evaluate
 from predict.predict import predict
 import constants.files as files
 import constants.models as m
-from utils import setup_logs, upload_logs_to_s3
+from utils import setup_logs
 
 
 def main(bool_dict):
@@ -49,7 +49,7 @@ def main(bool_dict):
         evaluate(prediction_file_path=files.PREDICTIONS_TEST)
 
     logging.info("Upload logs to S3")
-    upload_logs_to_s3()
+    # TODO 4: Importez et utilisez la fonction upload_logs_to_s3 du module utils.
 
 
 if __name__ == "__main__":
