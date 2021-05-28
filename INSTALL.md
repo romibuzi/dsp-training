@@ -55,6 +55,10 @@ Lancer le projet en local sans Airflow
     export PYTHONPATH="./src/:$PYTHONPATH"    
     python main.py
 
+Lancer la simulation de l’input drift
+
+    python src/scripts/simulate_input_drift.py
+
 ## Airflow
 
 Les commandes suivantes peuvent être lancées en local sur les Mac et distributions Linux.

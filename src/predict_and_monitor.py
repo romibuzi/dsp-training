@@ -13,7 +13,11 @@ def predict_and_monitor():
     """
     logging.info("*********** 1/5 Loading and splitting data ***********")
 
-    monitor_input_drift(files.NEW_LOANS_TO_ACCEPT, files.INPUT_STATS_HISTORY)
+    try:
+        monitor_input_drift(test_file_path=files.NEW_LOANS_TO_ACCEPT,
+                            input_stats_history_path=files.INPUT_STATS_HISTORY)
+    except:
+        logging.warning("Input drift detected !")
 
     predict(test_file_path=files.NEW_LOANS_TO_ACCEPT,
             preprocessing_pipeline_path=files.PREPROCESSING_PIPELINE,

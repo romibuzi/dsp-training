@@ -6,54 +6,55 @@ from sklearn.linear_model import LinearRegression
 
 from utils import load_pandas_df_from_s3, upload_pandas_df_to_s3
 from constants import files
+from constants import models as m
 from constants import columns as c
 
 
-def monitor_input_drift(new_loans_path, input_stats_history_path):
-    new_loans = pd.read_csv(new_loans_path)
+def monitor_input_drift(test_file_path, input_stats_history_path):
+    new_loans = load_pandas_df_from_s3(files.S3_BUCKET, test_file_path)
 
     logging.info("Append new stats to history and upload to s3.")
     datetime_now = datetime.now()
     mean_income = new_loans[c.Loans.ApplicantIncome].mean()
-    logging.info(mean_income)
+    logging.info(f"Mean income is {int(mean_income)}")
     mean_income_df = pd.DataFrame.from_records([{"timestamp": datetime_now, "mean_income": mean_income}])
     try:
-        input_stats_history = pd.read_csv(input_stats_history_path)
+        input_stats_history = load_pandas_df_from_s3(files.S3_BUCKET, input_stats_history_path)
     except:
         logging.info("Input stats history dataframe doesn’t exist yet, creating it now.")
         input_stats_history = None
 
     input_stats_history = pd.concat([input_stats_history, mean_income_df])
 
-    input_stats_history.to_csv(input_stats_history_path, index=False)
-    #upload_pandas_df_to_s3(input_stats_history, files.S3_BUCKET, input_stats_history_path)
+    upload_pandas_df_to_s3(input_stats_history, files.S3_BUCKET, input_stats_history_path)
 
-    if len(input_stats_history) >= 3:
+    if len(input_stats_history) >= m.INPUT_DRIFT_SPAN_IN_DAYS:
         lin_reg = LinearRegression()
 
-        # Fit linear regression on last 3 days
-        lin_reg.fit(np.array(range(3)).reshape(-1, 1), input_stats_history.tail(3)["mean_income"].values)
+        # Fit linear regression on last X days
+        lin_reg.fit(np.array(range(m.INPUT_DRIFT_SPAN_IN_DAYS)).reshape(-1, 1),
+                    input_stats_history.tail(m.INPUT_DRIFT_SPAN_IN_DAYS)["mean_income"].values)
 
-        if abs(lin_reg.coef_) > 100:
+        if abs(lin_reg.coef_) > m.DRIFT_THRESHOLD:
             msg = f"Incomes are evolving very quickly, model might become irrelevant soon !"
             logging.warning(msg)
             raise Exception(msg)
 
 
-def monitor_loans_ratio(prediction_file_path, input_stats_history_path, metrics_history_path):
+def monitor_loans_ratio(prediction_file_path, prediction_history_path, metrics_history_path):
     new_predictions = load_pandas_df_from_s3(files.S3_BUCKET, prediction_file_path)
 
     logging.info("Append new predictions to history and upload to s3.")
     datetime_now = datetime.now()
     new_predictions["timestamp"] = datetime_now
     try:
-        input_stats_history = load_pandas_df_from_s3(files.S3_BUCKET, input_stats_history_path)
+        prediction_history_history = load_pandas_df_from_s3(files.S3_BUCKET, prediction_history_path)
     except:
         logging.info("Prediction history dataframe doesn’t exist yet, creating it now.")
-        input_stats_history = None
+        prediction_history_history = None
 
-    new_input_stats_history = pd.concat([input_stats_history, new_predictions])
-    upload_pandas_df_to_s3(new_input_stats_history, files.S3_BUCKET, input_stats_history_path)
+    new_prediction_history_history = pd.concat([prediction_history_history, new_predictions])
+    upload_pandas_df_to_s3(new_prediction_history_history, files.S3_BUCKET, prediction_history_path)
 
     logging.info("Compute new metrics and upload to s3.")
     accepted_loans_ratio = new_predictions["prediction"].value_counts()["Y"] / len(new_predictions)

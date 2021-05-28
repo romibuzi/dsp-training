@@ -72,3 +72,8 @@ def upload_logs_to_s3():
     s3_resource = boto3.resource('s3')
 
     s3_resource.Object(S3_BUCKET, f"data/logs/{log_filename}").upload_file(Filename=LOG_FILE)
+
+
+def delete_s3_file(s3_bucket, filename):
+    s3_resource = boto3.resource('s3')
+    s3_resource.Object(s3_bucket, filename).delete()
